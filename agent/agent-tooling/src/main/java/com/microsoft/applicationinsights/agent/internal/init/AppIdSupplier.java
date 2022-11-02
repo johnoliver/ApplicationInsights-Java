@@ -18,9 +18,12 @@ import com.microsoft.applicationinsights.agent.internal.httpclient.LazyHttpClien
 import com.microsoft.applicationinsights.agent.internal.telemetry.TelemetryClient;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.slf4j.MDC;
 
@@ -41,6 +44,9 @@ public class AppIdSupplier {
   private final Object taskLock = new Object();
 
   private final TelemetryClient telemetryClient;
+
+  // guarded by taskLock
+  private final List<Consumer<String>> observers = new ArrayList<>();
 
   @Nullable private volatile String appId;
 
@@ -156,12 +162,41 @@ public class AppIdSupplier {
       }
 
       operationLogger.recordSuccess();
-      appId = body;
+      synchronized (taskLock) {
+        appId = body;
+
+        // Notify then clear appId observers
+        observers.forEach(
+            observer -> {
+              try {
+                observer.accept(appId);
+              } catch (Throwable e) {
+                logger.error("App id observer threw", e);
+              }
+            });
+        observers.clear();
+      }
     }
 
     private void backOff() {
       scheduledExecutor.schedule(this, backoffSeconds, SECONDS);
       backoffSeconds = Math.min(backoffSeconds * 2, 60);
+    }
+  }
+
+  public void asyncGet(Consumer<String> observer) {
+    // Fast path
+    if (appId != null) {
+      observer.accept(appId);
+      return;
+    }
+
+    synchronized (taskLock) {
+      if (appId != null) {
+        observer.accept(appId);
+      } else {
+        observers.add(observer);
+      }
     }
   }
 }
