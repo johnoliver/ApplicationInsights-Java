@@ -314,7 +314,7 @@ public class SecondEntryPoint implements AutoConfigurationCustomizerProvider {
     // adding this even if there are no roleNameOverrides, in order to support
     // overriding role name programmatically via Classic SDK
     tracerProvider.addSpanProcessor(new InheritedRoleNameSpanProcessor());
-    if (configuration.preview.profiler.enabled
+    if (Boolean.TRUE.equals(configuration.preview.profiler.enabled)
         && configuration.preview.profiler.enableRequestTriggering) {
       tracerProvider.addSpanProcessor(new AlertTriggerSpanProcessor());
     }

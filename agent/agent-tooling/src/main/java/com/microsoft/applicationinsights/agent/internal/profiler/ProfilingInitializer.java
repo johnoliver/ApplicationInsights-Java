@@ -91,7 +91,21 @@ public class ProfilingInitializer {
       Configuration configuration,
       File tempDir) {
 
-    if (configuration.preview.profiler.enabled) {
+    String ikey = TelemetryClient.getActive().getInstrumentationKey();
+
+    boolean userEnabled = Boolean.TRUE.equals(configuration.preview.profiler.enabled);
+
+    boolean randomlyEnable =
+        configuration.preview.profiler.enabled == null
+            && ikey != null
+            && Math.abs(TelemetryClient.getActive().getInstrumentationKey().hashCode() % 100)
+                < PERCENTAGE_OF_USERS_TO_ENABLE;
+
+    if (!userEnabled && randomlyEnable) {
+      logger.info("This account has been selected to be part of the profiling beta");
+    }
+
+    if (userEnabled || randomlyEnable) {
       performInit(
           appIdSupplier,
           processId,
@@ -101,24 +115,6 @@ public class ProfilingInitializer {
           userAgent,
           configuration,
           tempDir);
-    } else {
-      // Enable a percentage of users
-      appIdSupplier.asyncGet(
-          appId -> {
-            boolean profilerEnabled = (Math.abs(appId.hashCode()) % 100) < PERCENTAGE_OF_USERS_TO_ENABLE;
-            if (profilerEnabled) {
-              logger.info("This account has been selected to be part of the profiling beta");
-              performInit(
-                  appIdSupplier,
-                  processId,
-                  machineName,
-                  roleName,
-                  telemetryClient,
-                  userAgent,
-                  configuration,
-                  tempDir);
-            }
-          });
     }
   }
 
