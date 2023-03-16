@@ -51,6 +51,7 @@ include(":agent:agent-gc-monitor:gc-monitor-tests")
 
 include(":agent:agent-profiler:agent-alerting-api")
 include(":agent:agent-profiler:agent-diagnostics-api")
+include(":agent:agent-profiler:agent-diagnostics:agent-diagnostics-engine")
 include(":agent:agent-profiler:agent-alerting")
 
 include(":agent:agent-bootstrap")

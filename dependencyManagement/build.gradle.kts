@@ -29,7 +29,7 @@ val DEPENDENCY_BOMS = listOf(
   "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:${otelInstrumentationVersion}",
   "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:${otelInstrumentationAlphaVersion}",
   "com.azure:azure-sdk-bom:1.2.10",
-  "io.netty:netty-bom:4.1.89.Final",
+  "io.netty:netty-bom:4.1.90.Final",
   "org.junit:junit-bom:5.9.2",
   "org.testcontainers:testcontainers-bom:1.17.6",
 )
@@ -72,13 +72,13 @@ val CORE_DEPENDENCIES = listOf(
   "io.opentelemetry.javaagent:opentelemetry-javaagent-tooling:${otelInstrumentationAlphaVersion}",
   // temporarily overriding transitive dependency from azure-core until next azure-bom release
   // which targets at least reactor-netty-http:1.1.1
-  "io.projectreactor.netty:reactor-netty-http:1.1.4"
+  "io.projectreactor.netty:reactor-netty-http:1.1.5"
 )
 
 val DEPENDENCIES = listOf(
   "ch.qos.logback:logback-classic:1.2.11",
   "ch.qos.logback.contrib:logback-json-classic:0.1.5",
-  "com.uber.nullaway:nullaway:0.10.9",
+  "com.uber.nullaway:nullaway:0.10.10",
   "commons-codec:commons-codec:1.15",
   "org.apache.commons:commons-text:1.10.0",
   "com.google.code.gson:gson:2.10.1",
