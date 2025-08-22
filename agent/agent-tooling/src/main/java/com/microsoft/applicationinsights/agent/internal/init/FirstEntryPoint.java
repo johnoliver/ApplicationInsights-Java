@@ -8,6 +8,7 @@ import static com.microsoft.applicationinsights.agent.internal.diagnostics.MsgId
 
 import com.azure.monitor.opentelemetry.autoconfigure.implementation.utils.PropertyHelper;
 import com.google.auto.service.AutoService;
+import com.microsoft.applicationinsights.agent.internal.ManualProfileTest;
 import com.microsoft.applicationinsights.agent.internal.common.FriendlyException;
 import com.microsoft.applicationinsights.agent.internal.configuration.Configuration;
 import com.microsoft.applicationinsights.agent.internal.configuration.Configuration.SelfDiagnostics;
@@ -79,6 +80,8 @@ public class FirstEntryPoint implements LoggingCustomizer {
   @Override
   public void init(EarlyInitAgentConfig earlyConfig) {
     try {
+      ManualProfileTest.run();
+
       if (DEBUG_SIGNED_JAR_ACCESS) {
         JarVerifierClassFileTransformer transformer = new JarVerifierClassFileTransformer();
         Instrumentation instrumentation = InstrumentationHolder.getInstrumentation();

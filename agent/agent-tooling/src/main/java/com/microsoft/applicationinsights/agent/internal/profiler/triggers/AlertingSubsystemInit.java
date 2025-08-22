@@ -133,7 +133,7 @@ public class AlertingSubsystemInit {
     }
   }
 
-  private static void sendServiceProfilerIndex(
+  public static void sendServiceProfilerIndex(
       ServiceProfilerIndex serviceProfilerIndex, TelemetryClient telemetryClient) {
 
     EventTelemetryBuilder telemetryBuilder = telemetryClient.newEventTelemetryBuilder();
