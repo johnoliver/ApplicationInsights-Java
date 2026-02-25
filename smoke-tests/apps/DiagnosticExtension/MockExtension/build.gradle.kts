@@ -3,8 +3,7 @@ plugins {
 }
 
 dependencies {
-  compileOnly(project(":agent:agent-profiler:agent-diagnostics-api"))
-  compileOnly(project(":agent:agent-profiler:agent-alerting-api"))
+  implementation("com.microsoft.jeg.sre:microsoft-java-diagnostics:4.0.4-SNAPSHOT")
 }
 
 

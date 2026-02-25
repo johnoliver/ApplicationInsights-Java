@@ -6,11 +6,14 @@ package com.microsoft.applicationinsights.agent.internal.profiler.triggers;
 import com.microsoft.applicationinsights.agent.internal.profiler.config.ProfilerConfiguration;
 import com.microsoft.applicationinsights.alerting.aiconfig.AlertingConfig;
 import com.microsoft.applicationinsights.alerting.config.AlertConfiguration;
+import com.microsoft.applicationinsights.alerting.config.AlertConfigurationBuilder;
 import com.microsoft.applicationinsights.alerting.config.AlertMetricType;
 import com.microsoft.applicationinsights.alerting.config.AlertingConfiguration;
 import com.microsoft.applicationinsights.alerting.config.CollectionPlanConfiguration;
 import com.microsoft.applicationinsights.alerting.config.CollectionPlanConfiguration.EngineMode;
+import com.microsoft.applicationinsights.alerting.config.CollectionPlanConfigurationBuilder;
 import com.microsoft.applicationinsights.alerting.config.DefaultConfiguration;
+import com.microsoft.applicationinsights.alerting.config.DefaultConfigurationBuilder;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -72,7 +75,7 @@ public class AlertConfigParser {
 
     String[] tokens = collectionPlan.split(" ");
 
-    Map<String, ParseConfigValue<CollectionPlanConfiguration.Builder>> parsers = new HashMap<>();
+    Map<String, ParseConfigValue<CollectionPlanConfigurationBuilder>> parsers = new HashMap<>();
     parsers.put("single", new ParseConfigValue<>(false, (config, arg) -> config.setSingle(true)));
     parsers.put(
         "mode",
@@ -104,7 +107,7 @@ public class AlertConfigParser {
 
     String[] tokens = defaultConfig.split(" ");
 
-    Map<String, ParseConfigValue<DefaultConfiguration.Builder>> parsers = new HashMap<>();
+    Map<String, ParseConfigValue<DefaultConfigurationBuilder>> parsers = new HashMap<>();
     parsers.put(
         "sampling-profiling-duration",
         new ParseConfigValue<>(
@@ -134,7 +137,7 @@ public class AlertConfigParser {
     }
     String[] tokens = memoryConfig.split(" ");
 
-    Map<String, ParseConfigValue<AlertConfiguration.Builder>> parsers = new HashMap<>();
+    Map<String, ParseConfigValue<AlertConfigurationBuilder>> parsers = new HashMap<>();
     parsers.put(
         "memory-threshold",
         new ParseConfigValue<>(true, (config, arg) -> config.setThreshold(Float.parseFloat(arg))));
@@ -170,7 +173,7 @@ public class AlertConfigParser {
 
     String[] tokens = cpuConfig.split(" ");
 
-    Map<String, ParseConfigValue<AlertConfiguration.Builder>> parsers = new HashMap<>();
+    Map<String, ParseConfigValue<AlertConfigurationBuilder>> parsers = new HashMap<>();
     parsers.put(
         "cpu-threshold",
         new ParseConfigValue<>(true, (config, arg) -> config.setThreshold(Float.parseFloat(arg))));

@@ -4,15 +4,21 @@
 package com.microsoft.applicationinsights.agent.internal.profiler;
 
 import com.microsoft.applicationinsights.agent.internal.configuration.Configuration;
+import com.microsoft.applicationinsights.agent.internal.profiler.util.ServiceLoaderUtil;
 import com.microsoft.applicationinsights.alerting.config.AlertMetricType;
+import com.microsoft.applicationinsights.diagnostics.DiagnosticJfcConfigurationProvider;
+import com.microsoft.applicationinsights.diagnostics.ProfileResourceType;
+import com.microsoft.applicationinsights.diagnostics.configuration.DefaultDiagnosticJfcConfigurationProvider;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.opentelemetry.contrib.jfr.connection.JfcFileConfiguration;
 import io.opentelemetry.contrib.jfr.connection.RecordingConfiguration;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +38,7 @@ class AlternativeJfrConfigurations {
 
   /** Loads a pre-set recoding file that ships with Application Insights. */
   private static RecordingConfiguration getRecordingConfiguration(
-      ProfileTypes profile, String reducedProfile, String diagnosticProfile) {
+      ProfileResourceType profileResourceType, ProfileTypes profile, String reducedProfile) {
     switch (profile) {
       case PROFILE_WITHOUT_ENV_DATA:
         return new JfcFileConfiguration(
@@ -41,7 +47,7 @@ class AlternativeJfrConfigurations {
       case DIAGNOSTIC_PROFILE:
         return new JfcFileConfiguration(
             Objects.requireNonNull(
-                AlternativeJfrConfigurations.class.getResourceAsStream(diagnosticProfile)));
+                getDiagnosticJfcConfigurationProvider().getJfcConfiguration(profileResourceType)));
       default:
         return RecordingConfiguration.PROFILE_CONFIGURATION;
     }
@@ -118,16 +124,16 @@ class AlternativeJfrConfigurations {
   }
 
   static RecordingConfiguration getCpu(ProfileTypes profile) {
-    return getRecordingConfiguration(profile, REDUCED_CPU_PROFILE, DIAGNOSTIC_CPU_PROFILE);
+    return getRecordingConfiguration(ProfileResourceType.CPU, profile, REDUCED_CPU_PROFILE);
   }
 
   static RecordingConfiguration getMemory(ProfileTypes profile) {
-    return getRecordingConfiguration(profile, REDUCED_MEMORY_PROFILE, DIAGNOSTIC_MEMORY_PROFILE);
+    return getRecordingConfiguration(ProfileResourceType.MEMORY, profile, REDUCED_MEMORY_PROFILE);
   }
 
   static RecordingConfiguration getRequestConfiguration(ProfileTypes profile) {
     // Reusing the cpu profile as the most likely profile type required for a span trigger
-    return getRecordingConfiguration(profile, REDUCED_CPU_PROFILE, DIAGNOSTIC_CPU_PROFILE);
+    return getRecordingConfiguration(ProfileResourceType.CPU, profile, REDUCED_CPU_PROFILE);
   }
 
   static RecordingConfiguration get(ProfileTypes profile, AlertMetricType type) {
@@ -157,5 +163,31 @@ class AlternativeJfrConfigurations {
   static RecordingConfiguration getManualProfileConfig(Configuration.ProfilerConfiguration config) {
     return getRecordingConfiguration(
         config, config.manualTriggeredSettings, AlertMetricType.MANUAL);
+  }
+
+  static DiagnosticJfcConfigurationProvider getDiagnosticJfcConfigurationProvider() {
+    try {
+      List<DiagnosticJfcConfigurationProvider> diagnosticJfcConfigurationProviders =
+          ServiceLoaderUtil.findAllServiceLoaders(DiagnosticJfcConfigurationProvider.class, true);
+
+      if (diagnosticJfcConfigurationProviders.size() > 1) {
+        // A second provider has been provided, prefer the non-default one
+        diagnosticJfcConfigurationProviders =
+            diagnosticJfcConfigurationProviders.stream()
+                .filter(
+                    it -> !it.getClass().equals(DefaultDiagnosticJfcConfigurationProvider.class))
+                .collect(Collectors.toList());
+      }
+
+      if (diagnosticJfcConfigurationProviders.isEmpty()) {
+        logger.info("No DiagnosticJfcConfigurationProvider found, using default");
+        return new DefaultDiagnosticJfcConfigurationProvider();
+      }
+
+      return diagnosticJfcConfigurationProviders.get(0);
+    } catch (RuntimeException e) {
+      logger.error("Failed to load DiagnosticJfcConfigurationProvider, falling back to default", e);
+      return new DefaultDiagnosticJfcConfigurationProvider();
+    }
   }
 }

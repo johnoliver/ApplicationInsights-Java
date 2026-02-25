@@ -13,12 +13,10 @@ dependencies {
   implementation("io.opentelemetry.contrib:opentelemetry-jfr-connection")
   implementation("com.azure:azure-storage-blob")
 
-  implementation(project(":agent:agent-profiler:agent-alerting-api"))
-  implementation(project(":agent:agent-profiler:agent-alerting"))
+  implementation("com.microsoft.jeg.sre:microsoft-java-diagnostics:4.0.4-SNAPSHOT")
+
   implementation(project(":agent:agent-gc-monitor:gc-monitor-api"))
   implementation(project(":agent:agent-gc-monitor:gc-monitor-core"))
-  implementation(project(":agent:agent-profiler:agent-diagnostics-api"))
-  implementation(project(":agent:agent-profiler:agent-diagnostics"))
   implementation(project(":etw:java"))
 
   implementation("com.azure:azure-monitor-opentelemetry-autoconfigure:1.4.0")

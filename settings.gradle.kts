@@ -32,12 +32,6 @@ include(":agent:agent-gc-monitor:gc-monitor-api")
 include(":agent:agent-gc-monitor:gc-monitor-core")
 include(":agent:agent-gc-monitor:gc-monitor-tests")
 
-include(":agent:agent-profiler:agent-diagnostics-jfr")
-include(":agent:agent-profiler:agent-alerting-api")
-include(":agent:agent-profiler:agent-diagnostics-api")
-include(":agent:agent-profiler:agent-diagnostics")
-include(":agent:agent-profiler:agent-alerting")
-
 include(":agent:agent-bootstrap")
 include(":agent:agent-tooling")
 include(":agent:agent-for-testing")

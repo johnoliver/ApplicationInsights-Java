@@ -3,8 +3,7 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":agent:agent-profiler:agent-diagnostics-api"))
-  implementation(project(":agent:agent-profiler:agent-alerting-api"))
+  implementation("com.microsoft.jeg.sre:microsoft-java-diagnostics:4.0.4-SNAPSHOT")
   // MockExtension is loaded as a separate agent extension, not bundled in the app
   compileOnly(project(":smoke-tests:apps:DiagnosticExtension:MockExtension"))
   testImplementation(project(":smoke-tests:framework"))

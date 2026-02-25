@@ -144,12 +144,14 @@ public class PerformanceMonitoringService {
             Executors.newScheduledThreadPool(
                 1, ThreadPoolUtils.createNamedDaemonThreadFactory("DiagnosisThreadPool"));
 
+        int pid = Integer.parseInt(new PidFinder().getValue(System::getenv));
+
         DiagnosticEngine diagnosticEngine =
             diagnosticEngineFactory.create(
-                diagnosticEngineExecutorService, configuration.cgroupPath);
+                diagnosticEngineExecutorService, pid, configuration.cgroupPath);
 
         if (diagnosticEngine != null) {
-          diagnosticEngine.init(Integer.parseInt(new PidFinder().getValue(System::getenv)));
+          diagnosticEngine.init(pid);
         } else {
           diagnosticEngineExecutorService.shutdown();
         }
@@ -179,7 +181,7 @@ public class PerformanceMonitoringService {
               .collect(Collectors.toList());
     }
 
-    if (diagnosticEngines.size() == 0) {
+    if (diagnosticEngines.isEmpty()) {
       return null;
     }
 
