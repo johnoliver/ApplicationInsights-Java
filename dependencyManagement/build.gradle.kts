@@ -7,24 +7,24 @@ data class DependencySet(val group: String, val version: String, val modules: Li
 val dependencyVersions = hashMapOf<String, String>()
 rootProject.extra["versions"] = dependencyVersions
 
-val otelSdkVersion = "1.61.0"
-val otelSdkAlphaVersion = "1.61.0-alpha"
-val otelInstrumentationAlphaVersion = "2.27.0-alpha"
-val otelInstrumentationVersion = "2.27.0"
+val otelSdkVersion = "1.62.0"
+val otelSdkAlphaVersion = "1.62.0-alpha"
+val otelInstrumentationAlphaVersion = "2.28.1-alpha"
+val otelInstrumentationVersion = "2.28.1"
 val otelContribVersion = "1.56.0"
-val otelContribAlphaVersion = "1.56.0-alpha"
+val otelContribAlphaVersion = "1.57.0-alpha"
 
 rootProject.extra["otelInstrumentationVersion"] = otelInstrumentationVersion
 rootProject.extra["otelInstrumentationAlphaVersion"] = otelInstrumentationAlphaVersion
 
 val DEPENDENCY_BOMS = listOf(
-  "com.fasterxml.jackson:jackson-bom:2.21.3",
+  "com.fasterxml.jackson:jackson-bom:2.22.0",
   "io.opentelemetry:opentelemetry-bom:${otelSdkVersion}",
   "io.opentelemetry:opentelemetry-bom-alpha:${otelSdkAlphaVersion}",
   "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:${otelInstrumentationVersion}",
   "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:${otelInstrumentationAlphaVersion}",
-  "com.azure:azure-sdk-bom:1.3.6",
-  "io.netty:netty-bom:4.2.12.Final",
+  "com.azure:azure-sdk-bom:1.3.7",
+  "io.netty:netty-bom:4.2.15.Final",
   "org.junit:junit-bom:5.14.4",
   "org.testcontainers:testcontainers-bom:2.0.5",
 )
@@ -37,8 +37,8 @@ val mockitoVersion = "4.11.0"
 val slf4jVersion = "2.0.18"
 
 val CORE_DEPENDENCIES = listOf(
-  "io.opentelemetry.semconv:opentelemetry-semconv:1.41.1",
-  "io.opentelemetry.semconv:opentelemetry-semconv-incubating:1.41.1-alpha",
+  "io.opentelemetry.semconv:opentelemetry-semconv:1.42.0",
+  "io.opentelemetry.semconv:opentelemetry-semconv-incubating:1.42.0-alpha",
   "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator:${otelInstrumentationAlphaVersion}",
   "com.google.auto.service:auto-service:${autoServiceVersion}",
   "com.google.auto.service:auto-service-annotations:${autoServiceVersion}",
@@ -72,7 +72,7 @@ val DEPENDENCIES = listOf(
   "io.opentelemetry.contrib:opentelemetry-jfr-connection:${otelContribAlphaVersion}",
   "io.opentelemetry.contrib:opentelemetry-runtime-attach-core:${otelContribAlphaVersion}",
   "com.google.code.findbugs:jsr305:3.0.2",
-  "com.github.spotbugs:spotbugs-annotations:4.9.8"
+  "com.github.spotbugs:spotbugs-annotations:4.10.2"
 )
 
 javaPlatform {
