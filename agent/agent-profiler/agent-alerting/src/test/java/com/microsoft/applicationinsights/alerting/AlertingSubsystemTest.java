@@ -80,6 +80,7 @@ class AlertingSubsystemTest {
 
     assertThat(called.get().getType()).isEqualTo(AlertMetricType.CPU);
     assertThat(called.get().getAlertValue()).isEqualTo(90.0);
+    assertThat(called.get().getSettingsMoniker()).isNull();
   }
 
   @Test
@@ -123,6 +124,7 @@ class AlertingSubsystemTest {
             new ArrayList<>()));
 
     assertThat(called.get().getType()).isEqualTo(AlertMetricType.MANUAL);
+    assertThat(called.get().getSettingsMoniker()).isEqualTo("a-settings-moniker");
   }
 
   @Test
@@ -196,6 +198,7 @@ class AlertingSubsystemTest {
 
     assertThat(matchingBreach.get()).isNotNull();
     assertThat(matchingBreach.get().getType()).isEqualTo(AlertMetricType.MANUAL);
+    assertThat(matchingBreach.get().getSettingsMoniker()).isEqualTo("Portal_test");
     assertThat(unmatchedBreach.get()).isNull();
   }
 

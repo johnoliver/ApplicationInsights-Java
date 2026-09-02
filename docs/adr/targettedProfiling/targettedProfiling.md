@@ -99,10 +99,14 @@ Relevant behavior already in the repository:
 
 ### 4.1 Consume the additive v4 contract
 
-Change the profiler settings feature version sent by `ServiceProfilerClient` from `1.0.0` to
-`2.0.0`. ServiceProfiler maps both values to the existing v4 settings container; this advertises
-that the Java client understands `targetedCollectionPlan` and does not introduce a new endpoint or
-storage version.
+Prefer profiler settings feature version `2.0.0`. ServiceProfiler maps both `1.0.0` and `2.0.0` to
+the existing v4 settings container; `2.0.0` advertises that the Java client understands
+`targetedCollectionPlan` and does not introduce a new endpoint or storage version.
+
+Servers deployed before this contract return their disabled empty-ID sentinel for an unknown feature
+version. Detect that response, retry with `1.0.0`, and cache the downgrade for subsequent polls. This
+keeps legacy profiling operational during a staged service rollout without treating a legitimate
+disabled settings document, which carries the application ID, as an unsupported server.
 
 Continue accepting old settings documents that omit `targetedCollectionPlan`. Unknown future fields
 must continue to be ignored.
@@ -231,15 +235,15 @@ no disk persistence is proposed.
 
 ### 4.6 Preserve and verify result correlation
 
-The existing Java code uses `settingsMoniker` only for in-process deduplication; it is not
-propagated into `AlertBreach`, `ServiceProfilerIndex`, or upload metadata. The service and portal
-ADRs require moniker-based progress/result correlation.
+The Java agent carries `settingsMoniker` from the selected server collection plan through
+`AlertBreach` and publishes it as the `SettingsMoniker` property on the successful
+`ServiceProfilerIndex` event. The property name is additive and matches the service contract's
+terminology, allowing the portal to correlate the uploaded profile with the `OnDemandContract`
+returned by the targeted write.
 
-Before implementation, the ServiceProfiler owner and Java owner must confirm the expected artifact
-or telemetry field for this moniker. The implementation must then carry the moniker from
-`CollectionPlanConfiguration` through the manual `AlertBreach` and upload/index path without
-changing non-manual trigger metadata. This is a release-blocking contract decision, not an optional
-telemetry enhancement.
+Only server collection-plan profiles receive this property. CPU, memory, request, file, and JMX
+triggers remain unchanged, and rejected or failed profiles do not emit a successful correlated
+index event.
 
 ## 5. Proposed code changes
 
@@ -247,7 +251,9 @@ telemetry enhancement.
 
 - **Modify**
   `agent/agent-tooling/src/main/java/com/microsoft/applicationinsights/agent/internal/profiler/service/ServiceProfilerClient.java`
-  - Send `featureVersion=2.0.0`.
+  - Prefer `featureVersion=2.0.0`.
+  - Fall back once to `1.0.0` when an older server returns its disabled empty-ID sentinel, then cache
+    the negotiated version.
   - Keep the v4 route, `iKey`, and `oldTimestamp` behavior unchanged.
   - Treat `304 Not Modified` as an empty result and continue treating other non-success responses as
     failures.
@@ -267,7 +273,8 @@ Acceptance criteria:
   `expiration`, and `settingsMoniker`.
 - Unknown nested fields are ignored.
 - Malformed JSON fails the settings pull without partially applying a plan.
-- Settings requests advertise `2.0.0`.
+- Supported servers receive `2.0.0`; older servers are retried with and remain on `1.0.0`.
+- A legitimate disabled v4 document does not cause a downgrade.
 - An unchanged settings poll returns no configuration and does not log an error.
 
 ### Phase 2: Identity matching and validation
